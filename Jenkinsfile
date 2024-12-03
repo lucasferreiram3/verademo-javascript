@@ -9,7 +9,7 @@ pipeline {
         stage('Packaging') { 
             steps {
                 sh 'mkdir verascan'
-                sh 'find . -name "*.js" -o -name "*.html" -o -name "*.ts" -o -name "*.json" -o -name "*.css" | tar --exclude=./verascan --exclude=./*.git* --exclude=./*.github* --exclude=./*.png* --exclude=./*.svg* --exclude=./*.md* -cvzf verascan/upload.tar.gz .'
+                sh 'find . -name "*.js" -o -name "*.html" -o -name "*.ts" -o -name "*.json" -o -name "*.css" | tar --exclude=./verascan --exclude=./*.git* --exclude=./*.github* --exclude=./*.png* --exclude=./*.svg* --exclude=./*.md* --exclude=./*.min* -cvzf verascan/upload.tar.gz .'
             }
         }
 
@@ -18,10 +18,17 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'veracode-credentials', passwordVariable: 'VKEY', usernameVariable: 'VID')]) {
                     sh 'curl -sSO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip'
                     sh 'unzip -o pipeline-scan-LATEST.zip'
-                    sh 'java -jar pipeline-scan.jar --veracode_api_id "${VID}"  --veracode_api_key "${VKEY}" --file ${caminhoPacote}'
+                    sh 'java -jar pipeline-scan.jar --veracode_api_id "${VID}"  --veracode_api_key "${VKEY}" --file ${caminhoPacote} --issue_details true || true'
                 }
             }
-        }    
+        }
+
+        stage('Build Image') { 
+            steps {
+                sh 'docker build -t verademo-javascript:v"${BUILD_NUMBER}" .'
+            }
+        }
+
         stage("clean workspace") {
             steps {
                 script {
