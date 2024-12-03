@@ -4,7 +4,8 @@ pipeline {
         caminhoPacote = 'verascan/upload.tar.gz'
         wrapperVersion = '24.10.15.0'
         appProfile = 'verademo-javascript'
-    }        
+    }
+    stages {
         stage('Packaging') { 
             steps {
                 sh 'mkdir verascan'
@@ -14,9 +15,10 @@ pipeline {
         stage("clean workspace") {
             steps {
                 script {
-                sh "ls"
-                cleanWs()
-                sh "ls"
+                    sh "ls"
+                    cleanWs()
+                    sh "ls"
+                }
             }
         }
     }
