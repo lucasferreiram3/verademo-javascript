@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('Packaging') { 
             steps {
+                sh 'rm -rf verascan'
                 sh 'mkdir verascan'
                 sh 'find . -name "*.js" -o -name "*.html" -o -name "*.ts" -o -name "*.json" -o -name "*.css" | tar --exclude=./verascan --exclude=./*.git* --exclude=./*.github* --exclude=./*.png* --exclude=./*.svg* --exclude=./*.md* --exclude=./*.min* -cvzf verascan/upload.tar.gz .'
             }
@@ -26,6 +27,7 @@ pipeline {
         stage('Build Image') { 
             steps {
                 sh 'docker build -t verademo-javascript:v"${BUILD_NUMBER}" .'
+                sh 'docker images'
             }
         }
 
