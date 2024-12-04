@@ -10,7 +10,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'JSCRAMBLER_ACCESS_KEY', variable: 'JSCRAMBLER_ACCESS_KEY'), string(credentialsId: 'JSCRAMBLER_ACCESS_SECRET', variable: 'JSCRAMBLER_ACCESS_SECRET'), string(credentialsId: 'JSCRAMBLER_APP_ID', variable: 'JSCRAMBLER_APP_ID')]){
                     sh 'docker pull lucasferreiram3/jscrambler-cli:latest'
-                    sh 'docker run --rm -v ${PWD}/${PWD} lucasferreiram3/jscrambler-cli -a "${JSCRAMBLER_ACCESS_KEY}" -s "${JSCRAMBLER_ACCESS_SECRET}" -i "${JSCRAMBLER_APP_ID}" -c jscrambler.json -o protected'
+                    sh 'docker run --rm -v ${PWD}:/app lucasferreiram3/jscrambler-cli -a "${JSCRAMBLER_ACCESS_KEY}" -s "${JSCRAMBLER_ACCESS_SECRET}" -i "${JSCRAMBLER_APP_ID}" -c jscrambler.json -o protected'
                 }
             }
         }
