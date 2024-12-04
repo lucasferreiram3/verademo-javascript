@@ -24,7 +24,6 @@ pipeline {
                     sh 'docker rmi lucasferreiram3/verademo-javascript:v"${BUILD_NUMBER}" -f'
                     cleanWs()
                     sh 'ls'
-                }
             }
         }
     }
