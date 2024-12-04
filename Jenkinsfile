@@ -26,9 +26,10 @@ pipeline {
 
         stage('Build Image') { 
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) { {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh 'docker build -t verademo-javascript:v"${BUILD_NUMBER}" .'
                     sh 'docker images | grep verademo-javascript:v"${BUILD_NUMBER}"'
+                    sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
                     sh 'docker image push verademo-javascript:v"${BUILD_NUMBER}"'
                 }
             }
