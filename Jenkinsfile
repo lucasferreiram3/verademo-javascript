@@ -31,7 +31,7 @@ pipeline {
                     sh 'docker build -t verademo-javascript:v"${BUILD_NUMBER}" .'
                     sh 'docker tag verademo-javascript:v"${BUILD_NUMBER}" lucasferreiram3/verademo-javascript:v"${BUILD_NUMBER}"'
                     sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-                    sh 'docker image push verademo-javascript:v"${BUILD_NUMBER}"'
+                    sh 'docker image push lucasferreiram3/verademo-javascript:v"${BUILD_NUMBER}"'
                 }
             }
         }
