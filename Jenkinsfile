@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Veracode SAST - Pipeline Scan') { 
+        stage('Veracode SAST Pipeline Scan') { 
             steps {
                 withCredentials([usernamePassword(credentialsId: 'veracode-credentials', passwordVariable: 'VKEY', usernameVariable: 'VID')]) {
                     sh 'curl -sSO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip'
@@ -26,17 +26,31 @@ pipeline {
 
         stage('Build Image') { 
             steps {
-                sh 'docker build -t verademo-javascript:v"${BUILD_NUMBER}" .'
-                sh 'docker images'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) { {
+                    sh 'docker build -t verademo-javascript:v"${BUILD_NUMBER}" .'
+                    sh 'docker images | grep verademo-javascript:v"${BUILD_NUMBER}"'
+                    sh 'docker image push verademo-javascript:v"${BUILD_NUMBER}"'
+                }
+            }
+        }
+
+        stage('Aqua Image Scan') { 
+            steps {
+                withCredentials([string(credentialsId: 'AQUA_USER', variable: 'AQUA_USER'), string(credentialsId: 'AQUA_PASSWORD', variable: 'AQUA_PASS'), string(credentialsId: 'AQUA_HOST', variable: 'AQUA_HOST'), string(credentialsId: 'AQUA_SCANNER', variable: 'AQUA_SCANNER')]) {
+                    sh 'docker login registry.aquasec.com -u ${AQUA_USER} -p ${AQUA_PASS}'
+                    sh 'docker pull registry.aquasec.com/scanner:latest-saas'
+                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:latest-saas scan -H https://${AQUA_HOST}.cloud.aquasec.com -A ${AQUA_SCANNER} --local verademo:v"${BUILD_NUMBER}" '
+                }
             }
         }
 
         stage("clean workspace") {
             steps {
                 script {
-                    sh "ls"
+                    sh 'ls'
+                    sh 'docker rmi verademo-javascript:v"${BUILD_NUMBER}"'
                     cleanWs()
-                    sh "ls"
+                    sh 'ls'
                 }
             }
         }
